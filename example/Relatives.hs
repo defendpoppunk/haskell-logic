@@ -14,8 +14,14 @@ module Relatives
     ) where
 
 import Logic
+import RelationItem (RelationItem)
+import qualified RelationItem as RI
+import Relation (Relation, relationToMatrix, matrixToRelation)
+import RelationQuery (QueryElement(Fixed, Variable), RelationQuery)
+
 
 data Person = Sarah | John | Arnold | Anne | Alex | Spot | Kevin | Artemis deriving (Show, Eq)
+
 
 -- % parent(Parent, Child).
 -- parent(sarah, john).
@@ -29,7 +35,7 @@ parentsList = [ [Sarah, John]
               , [John, Alex] 
               ]
 parentsRelation :: Relation Person
-parentsRelation = listToRelation parentsList
+parentsRelation = matrixToRelation parentsList
 
 -- % parent(Owner, Pet).
 -- parent(john, spot).
@@ -41,51 +47,52 @@ petsList = [ [John, Spot]
            , [Alex, Artemis]
            ]
 petsRelation :: Relation Person
-petsRelation = listToRelation petsList
+petsRelation = matrixToRelation petsList
+
 
 -- ?- parent(parent, child).
 isParent :: Person -> Person -> Bool
 isParent parent child = relationHasResults $ applyQuery parentsRelation query
-    where query = RelQuery [Fixed parent, Fixed child]
+    where query = RI.fromList [Fixed parent, Fixed child]
 
 -- ?- parent(parent, X).
 getChildren :: Person -> [[Person]]
-getChildren parent = relationToList $ applyQuery parentsRelation query
-    where query = RelQuery [Fixed parent, Variable]
+getChildren parent = relationToMatrix $ applyQuery parentsRelation query
+    where query = RI.fromList [Fixed parent, Variable]
 
 -- ?- parent(X, child).
 getParents :: Person -> [[Person]]
-getParents child = relationToList $ applyQuery parentsRelation query
-    where query = RelQuery [Variable, Fixed child]
+getParents child = relationToMatrix $ applyQuery parentsRelation query
+    where query = RI.fromList [Variable, Fixed child]
 
 -- grandparent(Grandparent, Grandchild) :- parent(Grandparent, X), parent(X, Grandchild).
 -- ?- grandparent(grandparent, X).
 getGrandchildren :: Person -> [[Person]]
-getGrandchildren grandparent = relationToList $ applyQuery grandparentsRelation query
+getGrandchildren grandparent = relationToMatrix $ applyQuery grandparentsRelation query
     where grandparentsRelation = composeRelation parentsRelation parentsRelation 
-          query = RelQuery [Fixed grandparent, Variable]
+          query = RI.fromList [Fixed grandparent, Variable]
 
 -- childsPet(Parent, Pet) :- parent(Parent, X), pet(X, Pet).
 -- ?- childsPet(parent, X).
 getChildrensPets :: Person -> [[Person]]
-getChildrensPets parent = relationToList $ applyQuery childrensPetsRelation query
+getChildrensPets parent = relationToMatrix $ applyQuery childrensPetsRelation query
     where childrensPetsRelation = composeRelation parentsRelation petsRelation 
-          query = RelQuery [Fixed parent, Variable]
+          query = RI.fromList [Fixed parent, Variable]
 
 -- childOrParent(Person, ChildOrParent) :- parent(Person, X); child(Person, X).
 -- child(Child, Parent) :- parent(Parent, Child).
 -- ?- childOrParent(person, X).
 getChildrenAndParents :: Person -> [[Person]]
-getChildrenAndParents person = relationToList $ applyQuery childrenParentsRelation query
+getChildrenAndParents person = relationToMatrix $ applyQuery childrenParentsRelation query
     where childrenParentsRelation = combineRelation parentsRelation childrenRelation 
-          childrenRelation = permuteRelation [2, 1] parentsRelation
-          query = RelQuery [Fixed person, Variable]
+          childrenRelation = permuteRelation (RI.fromList [2, 1]) parentsRelation
+          query = RI.fromList [Fixed person, Variable]
 
 -- sibling(Person, Sibling) :- child(Person, X), parent(X, Sibling).
 -- child(Child, Parent) :- parent(Parent, Child).
 -- ?- sibling(person, X).
 getSiblings :: Person -> [[Person]]
-getSiblings person = relationToList $ applyQuery siblingsRelation query
+getSiblings person = relationToMatrix $ applyQuery siblingsRelation query
     where siblingsRelation = composeRelation childrenRelation parentsRelation
-          childrenRelation = permuteRelation [2, 1] parentsRelation
-          query = RelQuery [Fixed person, Variable]
+          childrenRelation = permuteRelation (RI.fromList [2, 1]) parentsRelation
+          query = RI.fromList [Fixed person, Variable]

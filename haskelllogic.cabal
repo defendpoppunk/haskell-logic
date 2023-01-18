@@ -13,6 +13,9 @@ source-repository head
 library
   exposed-modules:
       Logic
+    , Relation
+    , RelationItem
+    , RelationQuery
     , Relatives
     , TestData
   other-modules:
@@ -20,6 +23,7 @@ library
   hs-source-dirs:
       src
     , example
+    , src-temp
   build-depends:
       base >=4.7 && <5
   default-language: Haskell2010

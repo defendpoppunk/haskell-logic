@@ -1,7 +1,8 @@
 module TestData
     ( testQuery
     , testQueryFail
-    , testElem
+    , testItem3a
+    , testItem3b
     , testRelation3
     , testRelation2a
     , testRelation2b
@@ -10,14 +11,19 @@ module TestData
     , testList3
     ) where
 
-import Logic
+import RelationItem (RelationItem(RelItem))
+import Relation (Relation'(Rel), Relation)
+import RelationQuery (QueryElement(Fixed, Variable), RelationQuery)
+
 
 testQuery :: RelationQuery Int
-testQuery = RelQuery [Fixed 1, Fixed 2, Variable]
+testQuery = RelItem [Fixed 1, Fixed 2, Variable]
 testQueryFail :: RelationQuery Int
-testQueryFail = RelQuery [Fixed 1, Fixed 3, Variable]
-testElem :: RelationItem Int
-testElem = RelItem [1, 2, 3]
+testQueryFail = RelItem [Fixed 1, Fixed 3, Variable]
+testItem3a :: RelationItem Int
+testItem3a = RelItem [1, 2, 3]
+testItem3b :: RelationItem Int
+testItem3b = RelItem [4, 5, 6]
 testRelation3 :: Relation Int
 testRelation3 = Rel [RelItem [1, 2, 3], RelItem [4, 5, 6], RelItem [7, 8, 9]]
 testRelation2a :: Relation Int
