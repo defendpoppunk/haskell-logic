@@ -1,0 +1,25 @@
+cabal-version: 2.4
+
+name:           haskelllogic
+version:        0.1.0.0
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/defendpoppunk/haskelllogic
+
+library
+  exposed-modules:
+      Logic
+    , Relatives
+    , TestData
+  other-modules:
+      Paths_haskelllogic
+  hs-source-dirs:
+      src
+    , example
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
