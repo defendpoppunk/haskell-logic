@@ -59,13 +59,14 @@ getParents child = relationToList $ applyQuery parentsRelation query
     where query = RelQuery [Variable, Fixed child]
 
 -- grandparent(Grandparent, Grandchild) :- parent(Grandparent, X), parent(X, Grandchild).
--- ?- grandparent(sarah, X).
+-- ?- grandparent(grandparent, X).
 getGrandchildren :: Person -> [[Person]]
 getGrandchildren grandparent = relationToList $ applyQuery grandparentsRelation query
     where grandparentsRelation = composeRelation parentsRelation parentsRelation 
           query = RelQuery [Fixed grandparent, Variable]
 
 -- childsPet(Parent, Pet) :- parent(Parent, X), pet(X, Pet).
+-- ?- childsPet(parent, X).
 getChildrensPets :: Person -> [[Person]]
 getChildrensPets parent = relationToList $ applyQuery childrensPetsRelation query
     where childrensPetsRelation = composeRelation parentsRelation petsRelation 
@@ -73,14 +74,16 @@ getChildrensPets parent = relationToList $ applyQuery childrensPetsRelation quer
 
 -- childOrParent(Person, ChildOrParent) :- parent(Person, X); child(Person, X).
 -- child(Child, Parent) :- parent(Parent, Child).
+-- ?- childOrParent(person, X).
 getChildrenAndParents :: Person -> [[Person]]
 getChildrenAndParents person = relationToList $ applyQuery childrenParentsRelation query
     where childrenParentsRelation = combineRelation parentsRelation childrenRelation 
           childrenRelation = permuteRelation [2, 1] parentsRelation
           query = RelQuery [Fixed person, Variable]
 
--- childOrParent(Person, Sibling) :- child(Person, X), parent(X, Sibling).
+-- sibling(Person, Sibling) :- child(Person, X), parent(X, Sibling).
 -- child(Child, Parent) :- parent(Parent, Child).
+-- ?- sibling(person, X).
 getSiblings :: Person -> [[Person]]
 getSiblings person = relationToList $ applyQuery siblingsRelation query
     where siblingsRelation = composeRelation childrenRelation parentsRelation
