@@ -13,22 +13,15 @@ import RelationQuery
 import Control.Applicative
 
 
-queryElementEquals :: Eq a => QueryElement a -> a -> Bool
-queryElementEquals (Variable) _ = True
-queryElementEquals (Fixed y) x = x == y
-
 queryPredicate :: Eq a => RelationQuery a -> (RelationItem a -> Bool)
-queryPredicate rq ri = foldr (&&) True $ RI.zipWith queryElementEquals rq ri
+queryPredicate rq ri = foldr (&&) True $ RI.zipWith queryElementMatchesValue rq ri
 
 truncateByQuery :: Relation a -> RelationQuery a -> Relation a
 truncateByQuery r ri = fmap f r
-    where vm = queryVariableMask ri
-          f ri = truncateRelationItemByMask ri vm
+    where f = flip truncateRelationItemByMask (queryVariableMask ri)
 
 queryVariableMask :: RelationQuery a -> RelationItem Bool
-queryVariableMask ri = fmap f ri
-    where f (Variable) = True
-          f (Fixed _) = False
+queryVariableMask ri = fmap queryElementIsVariable ri
 
 truncateRelationItemByMask :: RelationItem a -> RelationItem Bool -> RelationItem a
 truncateRelationItemByMask ri vm = fmap fst $ RI.filter snd $ RI.zip ri vm

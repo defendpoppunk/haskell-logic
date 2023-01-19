@@ -15,7 +15,7 @@ import Data.Foldable (toList)
 import qualified Data.List as L
 
 
-data RelationItem a = RelItem [a] deriving (Show, Eq)
+data RelationItem a = RelItem [a] deriving (Show)
 instance Foldable RelationItem where
     foldr f x (RelItem xs) = foldr f x xs
 instance Functor RelationItem where

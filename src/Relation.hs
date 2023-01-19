@@ -18,7 +18,7 @@ import Data.Foldable (toList)
 import Control.Applicative
 
 
-data Relation' a = Rel [a] deriving (Show, Eq)
+data Relation' a = Rel [a] deriving (Show)
 instance Foldable Relation' where
     foldr f x (Rel xs) = foldr f x xs
 instance Functor Relation' where
