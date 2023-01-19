@@ -16,7 +16,7 @@ module Relatives
 import Logic
 import RelationItem (RelationItem)
 import qualified RelationItem as RI
-import Relation (Relation, relationToMatrix, matrixToRelation)
+import Relation hiding (filter)
 import RelationQuery (QueryElement(Fixed, Variable), RelationQuery)
 
 

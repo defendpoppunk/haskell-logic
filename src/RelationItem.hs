@@ -4,10 +4,13 @@ module RelationItem
     , filter
     , zip
     , sortBy
+    , zipWith
+    , relationItemsComposable
+    , composeRelationItems
     ) where
 
 import qualified Prelude as P
-import Prelude hiding (filter, zip)
+import Prelude hiding (filter, zip, zipWith)
 import Data.Foldable (toList)
 import qualified Data.List as L
 
@@ -30,3 +33,17 @@ zip ri1 ri2 = RelItem $ P.zip (toList ri1) (toList ri2)
 
 sortBy :: (a -> a -> Ordering) -> RelationItem a -> RelationItem a
 sortBy f ri = RelItem $ L.sortBy f (toList ri)
+
+zipWith :: (a -> b -> c) -> RelationItem a -> RelationItem b -> RelationItem c
+zipWith f ri1 ri2 = RelItem $ P.zipWith f (toList ri1) (toList ri2)
+
+
+relationItemsComposable :: Eq a => RelationItem a -> RelationItem a -> Bool
+relationItemsComposable (RelItem [])  _          = True
+relationItemsComposable  _           (RelItem []) = True
+relationItemsComposable (RelItem xs) (RelItem ys) = (last xs) == (head ys)
+
+composeRelationItems :: RelationItem a -> RelationItem a -> RelationItem a
+composeRelationItems  ri          (RelItem []) = ri
+composeRelationItems (RelItem [])  ri          = ri
+composeRelationItems (RelItem xs) (RelItem ys) = RelItem $ (init xs) ++ (tail ys)
