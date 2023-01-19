@@ -7,6 +7,7 @@ module RelationItem
     , zipWith
     , relationItemsComposable
     , composeRelationItems
+    , truncateRelationItemByMask
     ) where
 
 import qualified Prelude as P
@@ -47,3 +48,6 @@ composeRelationItems :: RelationItem a -> RelationItem a -> RelationItem a
 composeRelationItems  ri          (RelItem []) = ri
 composeRelationItems (RelItem [])  ri          = ri
 composeRelationItems (RelItem xs) (RelItem ys) = RelItem $ (init xs) ++ (tail ys)
+
+truncateRelationItemByMask :: RelationItem a -> RelationItem Bool -> RelationItem a
+truncateRelationItemByMask ri vm = fmap fst $ filter snd $ zip ri vm

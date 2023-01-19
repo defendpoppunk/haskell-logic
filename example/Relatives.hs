@@ -11,6 +11,7 @@ module Relatives
     , getChildrensPets
     , getChildrenAndParents
     , getSiblings
+    , basicCheck
     ) where
 
 import Logic
@@ -96,3 +97,8 @@ getSiblings person = relationToMatrix $ applyQuery siblingsRelation query
     where siblingsRelation = composeRelation childrenRelation parentsRelation
           childrenRelation = permuteRelation (RI.fromList [2, 1]) parentsRelation
           query = RI.fromList [Fixed person, Variable]
+
+
+basicCheck :: Bool
+basicCheck = (getChildrenAndParents John) == [[Sarah],[Arnold],[Anne],[Alex]]
+          && (getGrandchildren Sarah)     == [[Anne],[Alex]]

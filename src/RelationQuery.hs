@@ -3,6 +3,7 @@ module RelationQuery
     , RelationQuery
     , queryElementMatchesValue
     , queryElementIsVariable
+    , queryVariableMask
     ) where
 
 import RelationItem (RelationItem)
@@ -20,3 +21,6 @@ queryElementMatchesValue (Fixed x) y = x == y
 queryElementIsVariable :: QueryElement a -> Bool
 queryElementIsVariable (Variable) = True
 queryElementIsVariable (Fixed _) = False
+
+queryVariableMask :: RelationQuery a -> RelationItem Bool
+queryVariableMask ri = fmap queryElementIsVariable ri

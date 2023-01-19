@@ -20,12 +20,6 @@ truncateByQuery :: Relation a -> RelationQuery a -> Relation a
 truncateByQuery r ri = fmap f r
     where f = flip truncateRelationItemByMask (queryVariableMask ri)
 
-queryVariableMask :: RelationQuery a -> RelationItem Bool
-queryVariableMask ri = fmap queryElementIsVariable ri
-
-truncateRelationItemByMask :: RelationItem a -> RelationItem Bool -> RelationItem a
-truncateRelationItemByMask ri vm = fmap fst $ RI.filter snd $ RI.zip ri vm
-
 
 applyQuery :: Eq a => Relation a -> RelationQuery a -> Relation a
 applyQuery r ri = truncateByQuery r' ri
