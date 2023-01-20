@@ -8,17 +8,23 @@ module Relation
     , composeRelation
     , relationHasResults
     , permuteRelation
+    , relationFail
+    , relationTrue
+    , relationRepeat
+    , fromList
     ) where
 
 import Prelude hiding (filter)
 import qualified Prelude as P
-import RelationItem hiding (filter, zip, sortBy, zipWith)
+import RelationItem hiding (filter, zip, sortBy, zipWith, fromList)
 import qualified RelationItem as RI
 import Data.Foldable (toList)
 import Control.Applicative
+import ChurchList (ChurchList(ChurchList))
+import qualified ChurchList as CL
 
 
-data Relation' a = Rel [a] deriving (Show)
+data Relation' a = Rel (ChurchList a) deriving (Show)
 instance Foldable Relation' where
     foldr f x (Rel xs) = foldr f x xs
 instance Functor Relation' where
@@ -33,7 +39,10 @@ type Relation a = Relation' (RelationItem a)
 
 
 filter :: (a -> Bool) -> Relation' a -> Relation' a
-filter p r = Rel $ P.filter p (toList r)
+filter p r = Rel $ CL.fromList $ P.filter p (toList r)
+
+fromList :: [a] -> Relation' a
+fromList = Rel . CL.fromList
 
 
 combineRelation :: Relation' a -> Relation' a -> Relation' a
@@ -51,10 +60,20 @@ permuteRelation p = fmap f
 
 
 matrixToRelation :: [[a]] -> Relation a
-matrixToRelation xs = Rel $ reverse $ map (RI.fromList) xs
+matrixToRelation xs = fromList $ reverse $ map (RI.fromList) xs
 
 relationToMatrix :: Relation a -> [[a]]
-relationToMatrix (Rel xs) = reverse $ map toList xs
+relationToMatrix r = reverse $ map toList $ toList r
 
 relationHasResults :: Relation a -> Bool
 relationHasResults = not . null
+
+
+relationFail :: Relation a
+relationFail = Rel $ mempty
+
+relationTrue :: Relation a
+relationTrue = Rel $ pure mempty
+
+relationRepeat :: Relation a
+relationRepeat = fromList $ repeat mempty

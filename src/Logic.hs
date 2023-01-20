@@ -11,6 +11,7 @@ import Relation hiding (filter)
 import qualified Relation as R
 import RelationQuery
 import Control.Applicative
+import qualified ChurchList as CL
 
 
 queryPredicate :: Eq a => RelationQuery a -> (RelationItem a -> Bool)

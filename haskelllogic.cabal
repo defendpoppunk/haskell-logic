@@ -16,6 +16,7 @@ library
     , Relation
     , RelationItem
     , RelationQuery
+    , ChurchList
     , Relatives
     , TestData
   other-modules:
