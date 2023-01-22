@@ -24,22 +24,29 @@ import ChurchList (ChurchList(ChurchList))
 import qualified ChurchList as CL
 
 
-data Relation' a = Rel (ChurchList a) deriving (Show)
+data Relation' a = Rel { toChurchList :: ChurchList a } deriving (Show)
 instance Foldable Relation' where
-    foldr f x (Rel xs) = foldr f x xs
+    foldr f x = foldr f x . toChurchList
 instance Functor Relation' where
-    fmap f (Rel xs) = Rel $ fmap f xs
-instance Semigroup (Relation' a) where
-    (Rel xs) <> (Rel ys) = Rel $ xs <> ys
+    fmap = churchListMap . fmap
 instance Applicative Relation' where
     pure = Rel . pure
-    (Rel xs) <*> (Rel ys) = Rel $ xs <*> ys
+    (<*>) = churchListLiftA2 (<*>)
+instance Semigroup (Relation' a) where
+    (<>) = churchListLiftA2 (<>)
 
 type Relation a = Relation' (RelationItem a)
 
 
+churchListMap :: (ChurchList a -> ChurchList b) -> Relation' a -> Relation' b
+churchListMap f r = Rel $ f $ toChurchList r
+
+churchListLiftA2 :: (ChurchList a -> ChurchList b -> ChurchList c) -> Relation' a -> Relation' b -> Relation' c
+churchListLiftA2 f r1 r2 = Rel $ f (toChurchList r1) (toChurchList r2)
+
+
 filter :: (a -> Bool) -> Relation' a -> Relation' a
-filter p r = Rel $ CL.fromList $ P.filter p (toList r)
+filter = churchListMap . CL.filter
 
 fromList :: [a] -> Relation' a
 fromList = Rel . CL.fromList
@@ -60,10 +67,10 @@ permuteRelation p = fmap f
 
 
 matrixToRelation :: [[a]] -> Relation a
-matrixToRelation xs = fromList $ reverse $ map (RI.fromList) xs
+matrixToRelation = fromList . reverse . map RI.fromList
 
 relationToMatrix :: Relation a -> [[a]]
-relationToMatrix r = reverse $ map toList $ toList r
+relationToMatrix = reverse . map toList . toList
 
 relationHasResults :: Relation a -> Bool
 relationHasResults = not . null
@@ -76,4 +83,4 @@ relationTrue :: Relation a
 relationTrue = Rel $ pure mempty
 
 relationRepeat :: Relation a
-relationRepeat = fromList $ repeat mempty
+relationRepeat = Rel $ CL.repeat mempty
