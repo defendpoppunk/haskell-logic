@@ -5,7 +5,6 @@ module ChurchList
     , fromList
     , repeat
     , filter
-    , zip
     ) where
 
 import qualified Prelude as P
@@ -51,6 +50,3 @@ repeat x = cons x $ repeat x
 
 filter :: (a -> Bool) -> ChurchList a -> ChurchList a
 filter = mfilter
-
-zip :: ChurchList a -> ChurchList b -> ChurchList (a, b)
-zip = liftA2 (,)

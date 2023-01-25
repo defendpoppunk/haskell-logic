@@ -21,6 +21,9 @@ instance Foldable RelationItem where
     foldr f x (RelItem xs) = foldr f x xs
 instance Functor RelationItem where
     fmap f (RelItem xs) = RelItem $ fmap f xs
+instance Applicative RelationItem where
+    (RelItem xs) <*> (RelItem ys) = RelItem $ xs <*> ys
+    pure = RelItem . pure
 instance Semigroup (RelationItem a) where
     (RelItem xs) <> (RelItem ys) = RelItem $ xs <> ys
 instance Monoid (RelationItem a) where

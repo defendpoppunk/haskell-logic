@@ -14,7 +14,7 @@ module TestData
     ) where
 
 import RelationItem (RelationItem(RelItem))
-import Relation (Relation'(Rel), Relation)
+import Relation (Relation)
 import qualified Relation as R
 import RelationQuery (QueryElement(Fixed, Variable), RelationQuery)
 import qualified ChurchList as CL
@@ -33,11 +33,11 @@ testItem3a = RelItem [1, 2, 3]
 testItem3b :: RelationItem Int
 testItem3b = RelItem [4, 5, 6]
 testRelation3a :: Relation Int
-testRelation3a = R.fromList [RelItem [1, 2, 3], RelItem [4, 5, 6], RelItem [7, 8, 9]]
+testRelation3a = CL.fromList [RelItem [1, 2, 3], RelItem [4, 5, 6], RelItem [7, 8, 9]]
 testRelation2a :: Relation Int
-testRelation2a = R.fromList [RelItem [1, 3], RelItem [2, 3], RelItem [3, 4]]
+testRelation2a = CL.fromList [RelItem [1, 3], RelItem [2, 3], RelItem [3, 4]]
 testRelation2b :: Relation Int
-testRelation2b = R.fromList [RelItem [4, 5], RelItem [3, 6]]
+testRelation2b = CL.fromList [RelItem [4, 5], RelItem [3, 6]]
 testList2a :: [[Int]]
 testList2a = [[1, 3], [2, 3], [3, 4]]
 testList2b :: [[Int]]

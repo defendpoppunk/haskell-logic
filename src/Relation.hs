@@ -1,6 +1,5 @@
 module Relation
-    ( Relation'(Rel)
-    , Relation
+    ( Relation
     , relationToMatrix
     , matrixToRelation
     , filter
@@ -11,48 +10,23 @@ module Relation
     , relationFail
     , relationTrue
     , relationRepeat
-    , fromList
+    , relationNot
     ) where
 
-import Prelude hiding (filter)
+import Prelude hiding (filter, repeat)
 import qualified Prelude as P
 import RelationItem hiding (filter, zip, sortBy, zipWith, fromList)
 import qualified RelationItem as RI
 import Data.Foldable (toList)
 import Control.Applicative
-import ChurchList (ChurchList(ChurchList))
+import ChurchList (ChurchList(ChurchList), filter, repeat)
 import qualified ChurchList as CL
 
 
-data Relation' a = Rel { toChurchList :: ChurchList a } deriving (Show)
-instance Foldable Relation' where
-    foldr f x = foldr f x . toChurchList
-instance Functor Relation' where
-    fmap = churchListMap . fmap
-instance Applicative Relation' where
-    pure = Rel . pure
-    (<*>) = churchListLiftA2 (<*>)
-instance Semigroup (Relation' a) where
-    (<>) = churchListLiftA2 (<>)
-
-type Relation a = Relation' (RelationItem a)
+type Relation a = ChurchList (RelationItem a)
 
 
-churchListMap :: (ChurchList a -> ChurchList b) -> Relation' a -> Relation' b
-churchListMap f r = Rel $ f $ toChurchList r
-
-churchListLiftA2 :: (ChurchList a -> ChurchList b -> ChurchList c) -> Relation' a -> Relation' b -> Relation' c
-churchListLiftA2 f r1 r2 = Rel $ f (toChurchList r1) (toChurchList r2)
-
-
-filter :: (a -> Bool) -> Relation' a -> Relation' a
-filter = churchListMap . CL.filter
-
-fromList :: [a] -> Relation' a
-fromList = Rel . CL.fromList
-
-
-combineRelation :: Relation' a -> Relation' a -> Relation' a
+combineRelation :: Relation a -> Relation a -> Relation a
 combineRelation = (<>)
 
 composeRelation :: Eq a => Relation a -> Relation a -> Relation a
@@ -67,7 +41,7 @@ permuteRelation p = fmap f
 
 
 matrixToRelation :: [[a]] -> Relation a
-matrixToRelation = fromList . reverse . map RI.fromList
+matrixToRelation = CL.fromList . reverse . map RI.fromList
 
 relationToMatrix :: Relation a -> [[a]]
 relationToMatrix = reverse . map toList . toList
@@ -75,12 +49,17 @@ relationToMatrix = reverse . map toList . toList
 relationHasResults :: Relation a -> Bool
 relationHasResults = not . null
 
+relationNot :: Relation a -> Relation a
+relationNot r
+    | relationHasResults r = relationFail
+    | otherwise            = relationTrue
+
 
 relationFail :: Relation a
-relationFail = Rel $ mempty
+relationFail = mempty
 
 relationTrue :: Relation a
-relationTrue = Rel $ pure mempty
+relationTrue = pure mempty
 
 relationRepeat :: Relation a
-relationRepeat = Rel $ CL.repeat mempty
+relationRepeat = repeat mempty
